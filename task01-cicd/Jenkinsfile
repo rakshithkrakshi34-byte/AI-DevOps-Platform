@@ -16,37 +16,37 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                sh 'mvn test'
             }
         }
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
         stage('Docker Push') {
             steps {
-                bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
+                sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat 'kubectl set image deployment/devops-demo springboot=%IMAGE_NAME%:%IMAGE_TAG%'
+                sh 'kubectl set image deployment/devops-demo springboot=$IMAGE_NAME:$IMAGE_TAG'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                bat 'kubectl rollout status deployment/devops-demo --timeout=120s'
+                sh 'kubectl rollout status deployment/devops-demo --timeout=120s'
             }
         }
     }
